@@ -48,3 +48,4 @@ def join_room(request: Request, room_id: str):
     })
     return {"message": f"Joined room {room['room_name']}"}
 
+
