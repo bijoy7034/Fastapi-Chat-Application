@@ -4,16 +4,30 @@ from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect, status
 from jose import JWTError
 from utils.token import decode_token
 from db.mongo_instance import mongoDB
+from collections import defaultdict
 
 router = APIRouter(prefix='/ws')
 
-connections = dict[str, List[WebSocket]] = {}
+connections: dict[str, List[WebSocket]] = {}
+
 
 @router.websocket('/chat/{room_id}')
-async def websocket_connection(request: Request, ws : WebSocket, room_id: str ):
+async def websocket_connection( ws : WebSocket, room_id: str ):
     message_collection = mongoDB.db['messages']
     room_collection = mongoDB.db['rooms']
-    username = request.state.user['username']
+    
+    token = ws.query_params.get('token')
+    if not token :
+        await ws.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+    try:
+        payload = decode_token(token)
+        username = payload.get('username')
+        if not username:
+            ValueError("No username")
+    except JWTError as e:
+        ws.close(code=status.WS_1008_POLICY_VIOLATION)
+    
     if not username:
         raise ValueError("No username in token")
     
@@ -33,11 +47,11 @@ async def websocket_connection(request: Request, ws : WebSocket, room_id: str ):
     
     try:
         while True:
-            data = await ws.receive_json()
+            data = await ws.receive_text()
             message_data = {
                "room_id": room_id,
                 "sender": username, 
-                "message": data.get("message"),
+                "message": data,
                 "timestamp": datetime.utcnow()
             }
             message_collection.insert_one(message_data)
