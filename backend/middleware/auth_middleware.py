@@ -4,7 +4,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from utils.token import decode_token
 from jose import JWTError
 
-ALLOWED_ROUTES = ["/auth/login/", "/auth/register/", "/auth/login", "/auth/register"]
+ALLOWED_ROUTES = ["/auth/login/", "/auth/register/", "/auth/login", "/auth/register", '/docs', '/openapi.json']
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
