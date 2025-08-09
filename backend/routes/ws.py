@@ -57,7 +57,7 @@ async def websocket_connection( ws : WebSocket, room_id: str ):
             message_collection.insert_one(message_data)
             for conn in connections[room_id]:
                 if conn != ws:
-                    await conn.send_json(message_data)
+                    await conn.send_text(data)
     except WebSocketDisconnect:
         connections[room_id].remove(ws)
                     

@@ -17,7 +17,7 @@ def register(user: UserRegister):
     user_data = user.model_dump()
     user_data["password"] = hash_password(user.password)
     user_data.pop("confirm_password", None)
-
+ 
     user_collection.insert_one(user_data)
     return {"message": "User created successfully"}
 
