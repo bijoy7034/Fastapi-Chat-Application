@@ -1,4 +1,26 @@
+import { useState } from "react";
+import { useAuthStore } from "../store/authStore";
+
 function Auth() {
+  const { loading, error, login } = useAuthStore();
+
+  const [formData, setFormData] = useState({
+    username: "",
+    password: ""
+  });
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    login(formData.username, formData.password);
+  };
+
   return (
     <div
       className="container login"
@@ -7,22 +29,40 @@ function Auth() {
       <b>
         <h3 className="text-center mb-4 text-bold">Login</h3>
       </b>
-
-      {/* {error && (
+      {loading && (
+        <div className="alert alert-info" role="alert">
+          Loading...
+        </div>
+      )}
+      {error && (
         <div className="alert alert-danger" role="alert">
           {error}
         </div>
-      )} */}
+      )}
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Email address</label>
-          <input type="email" className="form-control form-control-sm" required />
+          <input
+            name="username" 
+            value={formData.username}
+            onChange={handleOnChange}
+            type="email"
+            className="form-control form-control-sm"
+            required
+          />
         </div>
 
         <div className="mb-3">
           <label className="form-label">Password</label>
-          <input type="password" className="form-control form-control-sm" required />
+          <input
+            name="password" 
+            value={formData.password}
+            onChange={handleOnChange}
+            type="password"
+            className="form-control form-control-sm"
+            required
+          />
         </div>
 
         <div className="mb-3 form-check">
