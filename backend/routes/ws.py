@@ -4,7 +4,6 @@ from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect, status
 from jose import JWTError
 from utils.token import decode_token
 from db.mongo_instance import mongoDB
-from collections import defaultdict
 
 router = APIRouter(prefix='/ws')
 
